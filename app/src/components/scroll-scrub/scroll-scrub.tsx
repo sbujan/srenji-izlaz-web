@@ -48,19 +48,14 @@ export interface ScrollScrubTheme {
 /**
  * One continuous film for phones, replacing the per-chapter clips there.
  *
- * The chapter clips are cuts of a single unbroken shot, and playing each from
- * its own zero means the world jumps forward at every seam unless the visitor
- * waits out the full clip. A single element playing one file makes continuity
- * structural: arriving at chapter i extends the playback target to
- * `chapterEnds[i]` and the film simply keeps going — it can never jump, and
- * only one video is ever decoded and composited. `chapterEnds` are the
- * source-time boundaries between chapters, in seconds, ending at the film's
- * duration. Pass a module-level constant: the controller effect re-initialises
+ * The film is scenery: it plays exactly once, first frame to last, and holds
+ * the final frame; scrolling moves only the text over it. One element, one
+ * decode pipeline, and continuity is structural — a single file cannot jump at
+ * a seam. Pass a module-level constant: the controller effect re-initialises
  * when this prop's identity changes.
  */
 export interface ScrollScrubMobileFilm {
   src: string;
-  chapterEnds: number[];
 }
 
 export interface ScrollScrubProps {
@@ -284,8 +279,6 @@ export function ScrollScrub({
 
     let active = -1;
     let activeSegment = -1;
-    /** Film mode: source-time the film may play up to before pausing. */
-    let filmTarget = 0;
     let destroyed = false;
     let dirty = true;
     let frame = 0;
@@ -598,30 +591,17 @@ export function ScrollScrub({
       if (activeSegment !== currentIndex) {
         activeSegment = currentIndex;
       }
-      if (filmVisual()) {
-        updateFilm();
-      } else if (playMode()) {
+      if (!filmVisual() && playMode()) {
         updatePlayback();
       }
     };
 
     /**
-     * Film driver, dirty frames only. Forward-only: arriving at a chapter
-     * extends the playback target to that chapter's end and the film keeps
-     * going from wherever it is — world time never jumps at a seam, which is
-     * the whole point of the single file. Moving backwards is the one seek:
-     * replay that chapter's phase from its first frame. Idempotent per frame,
-     * so it also catches the film becoming ready under a chapter that is
-     * already on screen, and retries a play() the platform refused once the
-     * first gesture arrives.
-     */
-    /**
      * True when the buffered ranges cover the film from the playhead through
      * `time`. Playback that starts without this freezes mid-motion the moment
-     * it outruns the download — measured on Fast 3G as visible stalls just
-     * before each chapter boundary. Waiting behind a still frame instead is
-     * invisible: the poster is the film's exact first frame, and later holds
-     * are the previous chapter's end frame.
+     * it outruns the download — measured on Fast 3G as visible stalls. Waiting
+     * behind a still frame instead is invisible: the poster is the film's
+     * exact first frame.
      */
     const bufferedThrough = (video: HTMLVideoElement, time: number) => {
       for (let i = 0; i < video.buffered.length; i++) {
@@ -635,46 +615,44 @@ export function ScrollScrub({
       return false;
     };
 
+    /**
+     * Film driver, dirty frames only. The film is scenery, not state: it plays
+     * exactly once, first frame to last, and stops there on its own (`ended`
+     * with no loop holds the final frame). Scrolling never pauses, seeks or
+     * restarts it — the text blocks move over it independently. Playback waits
+     * until the whole file is buffered so the single playthrough can never
+     * freeze mid-motion; until then the poster (the film's own first frame)
+     * covers. Idempotent per frame, which also retries a play() the platform
+     * refused once the first gesture arrives.
+     */
     const updateFilm = () => {
       const segment = runtime[0];
       const { video } = segment;
-      const ends = mobileFilm?.chapterEnds ?? [];
-      if (!video || !segment.ready || ends.length === 0) {
+      if (!video || !segment.ready) {
         return;
       }
-      const chapter = Math.min(
-        runtime[activeSegment]?.sectionIndex ?? 0,
-        ends.length - 1
-      );
-      const target = ends[chapter];
-      if (target < filmTarget - 0.05) {
-        const start = chapter === 0 ? 0.001 : ends[chapter - 1];
-        try {
-          video.currentTime = start;
-        } catch {
-          // Not seekable yet; playing on from here still looks continuous.
-        }
-      }
-      filmTarget = target;
+      const duration = video.duration || 0;
+      // Start when the whole file is buffered, OR when the browser has both
+      // reached HAVE_ENOUGH_DATA and STOPPED downloading. The second clause
+      // breaks a real deadlock: with preload="auto" the browser may halt the
+      // fetch at "enough" (observed idle at ~5 of 6 s buffered) and only resume
+      // once playback approaches — which a full-buffer-only gate never lets
+      // happen. It is deliberately conditioned on the fetch being idle: while
+      // data is still arriving (a slow connection), readyState 4 alone is an
+      // optimistic estimate — trusting it mid-download produced a measured
+      // stall at 3.9 s on Fast 3G — so there we simply wait for the tail.
+      const NETWORK_LOADING = 2;
       if (
         video.paused &&
-        video.currentTime < filmTarget - 0.05 &&
-        bufferedThrough(
-          video,
-          Math.min(filmTarget, (video.duration || filmTarget) - 0.05)
-        )
+        !video.ended &&
+        duration > 0 &&
+        video.currentTime < duration - 0.05 &&
+        (bufferedThrough(video, duration - 0.05) ||
+          (video.readyState >= 4 && video.networkState !== NETWORK_LOADING))
       ) {
         void video.play().catch(() => {
           // Autoplay refused (iOS Low Power Mode). onFirstGesture retries.
         });
-      }
-    };
-
-    /** Every frame: stop on the active chapter's end frame. */
-    const holdFilmAtTarget = () => {
-      const { video } = runtime[0];
-      if (video && !video.paused && video.currentTime >= filmTarget - 0.02) {
-        video.pause();
       }
     };
 
@@ -756,8 +734,12 @@ export function ScrollScrub({
         readScroll();
       }
       updateVideos();
+      // Every frame, not just dirty ones: the play gate depends on buffering
+      // state the dirty flag cannot reliably track (a `progress` event can
+      // land before `ready` does, leaving no later signal). The check is a
+      // handful of comparisons on one element.
       if (filmVisual()) {
-        holdFilmAtTarget();
+        updateFilm();
       }
       frame = window.requestAnimationFrame(tick);
     };
@@ -777,9 +759,8 @@ export function ScrollScrub({
       }
       userReady = true;
       if (filmVisual()) {
-        // updateFilm retries the play() the platform refused before a gesture;
-        // primeVideo's play-then-pause would stop a film already in flight.
-        dirty = true;
+        // updateFilm runs every frame and retries the refused play() by
+        // itself; primeVideo's play-then-pause would stop a film in flight.
         return;
       }
       for (const segment of runtime) {

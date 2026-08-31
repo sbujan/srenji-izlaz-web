@@ -42,10 +42,11 @@
   - **Mobile framing:** subject is center-safe (buildings centered); mobile
     encodes 720p center-crop via object-position 50%.
   - **Mobile playback:** phones do NOT scrub. One continuous film
-    (scene-full-mobile.mp4) in a single video element plays forward-only:
-    arriving at a chapter extends the playback target to that chapter's end, so
-    the world can never jump at a seam; swiping back replays that phase. One
-    swipe, one chapter, one text block. Desktop keeps the three-cut scrub.
+    (scene-full-mobile.mp4) in a single video element plays exactly once, first
+    frame to last, then holds the final frame — the film is scenery. Scrolling
+    moves only the text blocks (one swipe, one chapter, one text block); it
+    never pauses, seeks or restarts the film. Desktop keeps the three-cut
+    scrub.
   - **Delivery budget:** ≤32 MiB desktop, **≤3 MB mobile page total**. The
     original ≤16 MiB mobile ceiling was loose enough to call a 9.8 MiB journey
     healthy, which it was not — a phone waited seconds before anything moved.

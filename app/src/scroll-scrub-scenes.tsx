@@ -17,13 +17,11 @@ import type {
 
 /**
  * Phones play this single continuous encode of the whole shot instead of the
- * three per-chapter cuts — one element, no seams, forward-only playback.
- * chapterEnds are the source-time cut points measured from the deployed file
- * (2.000 s + 2.000 s + 2.042 s segments).
+ * three per-chapter cuts — once through, first frame to last, with scrolling
+ * moving only the text over it.
  */
 export const scrollScrubMobileFilm: ScrollScrubMobileFilm = {
   src: "/assets/world/scene-full-mobile.mp4",
-  chapterEnds: [2.0, 4.0, 6.042],
 };
 
 /** Brand tokens for the journey layer (design-brief.md). */
