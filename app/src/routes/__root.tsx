@@ -10,14 +10,13 @@ import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { LanguageProvider } from "../lib/i18n";
+import { WhatsAppButton } from "../components/site/whatsapp-button";
 
 // Absolute origin for canonical + og: tags. Social scrapers reject relative
 // image URLs, so these must be absolute even though the files are local.
 // Vercel exposes the deployment origin; set VITE_SITE_URL to the custom domain
 // so previews and production both advertise the canonical host.
-const SITE_URL = (
-  import.meta.env.VITE_SITE_URL ?? "https://srednjiizlaz.hr"
-).replace(/\/$/, "");
+const SITE_URL = (import.meta.env.VITE_SITE_URL ?? "https://srednjiizlaz.hr").replace(/\/$/, "");
 
 const TITLE = "Srednji izlaz d.o.o. · Najbrži u svom poslu";
 const DESCRIPTION =
@@ -60,7 +59,7 @@ export const Route = createRootRoute({
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap",
       },
     ],
   }),
@@ -89,6 +88,7 @@ function RootComponent() {
     <LanguageProvider>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <WhatsAppButton />
     </LanguageProvider>
   );
 }
@@ -109,9 +109,7 @@ function MessagePage({
           <p className="si-eyebrow">Srednji izlaz d.o.o.</p>
           <h1 className="si-h2">{title}</h1>
           <p className="si-lead">{body}</p>
-          <div style={{ display: "flex", gap: "1rem", marginTop: "2.5rem" }}>
-            {children}
-          </div>
+          <div style={{ display: "flex", gap: "1rem", marginTop: "2.5rem" }}>{children}</div>
         </div>
       </section>
     </div>

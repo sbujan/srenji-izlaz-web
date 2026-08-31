@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { SiteFooter } from "@/components/site/footer";
 import { SiteNav } from "@/components/site/nav";
+import { MailtoAction } from "@/components/site/contact-reveal";
 import { Reveal } from "@/components/site/reveal";
 import { useLang, type Lang } from "@/lib/i18n";
 
@@ -128,7 +129,9 @@ function Karijera() {
                 alt="Srednji izlaz"
                 className="si-hero-img"
                 loading="lazy"
+                height={1066}
                 src="/assets/img/karijera.jpg"
+                width={1600}
               />
             </Reveal>
             <div style={{ marginTop: "3rem" }}>
@@ -140,17 +143,15 @@ function Karijera() {
                       <p className="si-job-meta">{job.meta}</p>
                       <p>{job.body}</p>
                     </div>
-                    <a
+                    <MailtoAction
                       className="si-cta-positions"
-                      href={`mailto:ivan@srednjiizlaz.hr?subject=${encodeURIComponent(
-                        `${t.applySubject}: ${job.title}`,
-                      )}`}
+                      subject={`${t.applySubject}: ${job.title}`}
                     >
                       {t.apply}
                       <span aria-hidden="true" className="si-arrow">
                         →
                       </span>
-                    </a>
+                    </MailtoAction>
                   </div>
                 </Reveal>
               ))}
@@ -161,14 +162,9 @@ function Karijera() {
                   <h3>{t.openTitle}</h3>
                   <p>{t.openBody}</p>
                 </div>
-                <a
-                  className="si-cta-inquiry"
-                  href={`mailto:ivan@srednjiizlaz.hr?subject=${encodeURIComponent(
-                    t.openSubject,
-                  )}`}
-                >
+                <MailtoAction className="si-cta-inquiry" subject={t.openSubject}>
                   {t.openCta}
-                </a>
+                </MailtoAction>
               </div>
             </Reveal>
           </div>

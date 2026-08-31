@@ -2,14 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { SiteFooter } from "@/components/site/footer";
 import { SiteNav } from "@/components/site/nav";
+import { ContactReveal } from "@/components/site/contact-reveal";
 import { Reveal } from "@/components/site/reveal";
 import { ScrollScrub } from "@/components/scroll-scrub/scroll-scrub";
 import { useLang, type Lang } from "@/lib/i18n";
-import {
-  scrollScrubScenesEn,
-  scrollScrubScenesHr,
-  scrollScrubTheme,
-} from "@/scroll-scrub-scenes";
+import { scrollScrubScenesEn, scrollScrubScenesHr, scrollScrubTheme } from "@/scroll-scrub-scenes";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -33,6 +30,7 @@ const copy: Record<
     factAddress: string;
     factFounded: string;
     factEmail: string;
+    factPhone: string;
   }
 > = {
   hr: {
@@ -55,6 +53,7 @@ const copy: Record<
     factAddress: "Adresa",
     factFounded: "Osnovano",
     factEmail: "E-mail",
+    factPhone: "Telefon",
   },
   en: {
     servicesEyebrow: "What we do",
@@ -76,6 +75,7 @@ const copy: Record<
     factAddress: "Address",
     factFounded: "Founded",
     factEmail: "E-mail",
+    factPhone: "Phone",
   },
 };
 
@@ -102,7 +102,9 @@ function Index() {
                 <img
                   alt={t.s1Title}
                   loading="lazy"
+                  height={843}
                   src="/assets/img/gradnja.jpg"
+                  width={1500}
                 />
               </Reveal>
               <Reveal className="si-split-body" delay={90}>
@@ -121,7 +123,9 @@ function Index() {
                 <img
                   alt={t.s2Title}
                   loading="lazy"
+                  height={1066}
                   src="/assets/img/nekretnine.jpg"
+                  width={1600}
                 />
               </Reveal>
               <Reveal className="si-split-body" delay={90}>
@@ -152,7 +156,9 @@ function Index() {
                   alt="Srednji izlaz"
                   className="si-about-img"
                   loading="lazy"
+                  height={1066}
                   src="/assets/img/projektiranje.jpg"
+                  width={1600}
                 />
               </Reveal>
             </div>
@@ -177,9 +183,13 @@ function Index() {
                 <div className="si-fact">
                   <dt>{t.factEmail}</dt>
                   <dd>
-                    <a href="mailto:ivan@srednjiizlaz.hr">
-                      ivan@srednjiizlaz.hr
-                    </a>
+                    <ContactReveal kind="email" />
+                  </dd>
+                </div>
+                <div className="si-fact">
+                  <dt>{t.factPhone}</dt>
+                  <dd>
+                    <ContactReveal kind="phone" />
                   </dd>
                 </div>
                 <div className="si-fact">

@@ -2,6 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { SiteFooter } from "@/components/site/footer";
 import { SiteNav } from "@/components/site/nav";
+import {
+  ContactReveal,
+  MailtoAction,
+} from "@/components/site/contact-reveal";
 import { Reveal } from "@/components/site/reveal";
 import { useLang, type Lang } from "@/lib/i18n";
 
@@ -151,25 +155,22 @@ function Oglasi() {
                     <p>{item.body}</p>
                     <div className="si-listing-price">
                       <span>{item.price}</span>
-                      <a
+                      <MailtoAction
                         className="si-cta-positions"
-                        href={`mailto:ivan@srednjiizlaz.hr?subject=${encodeURIComponent(
-                          `Upit: ${item.title}`,
-                        )}`}
+                        subject={`Upit: ${item.title}`}
                       >
                         {item.inquire}
                         <span aria-hidden="true" className="si-arrow">
                           →
                         </span>
-                      </a>
+                      </MailtoAction>
                     </div>
                   </div>
                 </Reveal>
               ))}
             </div>
             <p className="si-note">
-              {t.note}{" "}
-              <a href="mailto:ivan@srednjiizlaz.hr">ivan@srednjiizlaz.hr</a>.
+              {t.note} <ContactReveal kind="email" />
             </p>
           </div>
         </section>
