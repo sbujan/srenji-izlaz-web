@@ -111,20 +111,23 @@ button {
  *
  * The snap container has to be the document — the chapters are laid out in the
  * page flow, not inside a scroller — so this is scoped to the mobile breakpoint
- * and paired with `scroll-snap-align` on the chapters themselves and on the
- * first section after the film. Sections with no alignment are not snap targets,
- * so the rest of the page scrolls normally; giving the section below the film an
- * alignment just means leaving the last chapter lands somewhere deliberate
- * instead of on a mandatory container with no target in range.
+ * and paired with `scroll-snap-align` on the chapters themselves.
+ *
+ * `proximity`, NOT `mandatory`. A mandatory container has to come to rest on a
+ * snap point, and the last one is the third chapter — so the page physically
+ * could not be scrolled past the film, leaving everything below it unreachable
+ * on a phone. Adding a snap target to the section underneath does not fix that;
+ * it just moves the dead end further down, because past that target there is
+ * again nothing to rest on. Proximity snaps when a gesture ends near a chapter
+ * and otherwise leaves scrolling alone, which is all this ever needed to do:
+ * the one-swipe-one-chapter feel comes from the chapters being exactly one
+ * viewport tall, not from the snapping.
  *
  * `scroll-snap-type` is not an overflow property, so it does not create a scroll
  * container and the sticky pinning the film depends on is unaffected. */
 @media (max-width: 860px) {
   html {
-    scroll-snap-type: y mandatory;
-  }
-  .si-page > main > .si-section:first-of-type {
-    scroll-snap-align: start;
+    scroll-snap-type: y proximity;
   }
 }
 

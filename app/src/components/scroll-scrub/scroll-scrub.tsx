@@ -360,7 +360,6 @@ export function ScrollScrub({
         video.preload = "auto";
         video.setAttribute("muted", "");
         video.setAttribute("playsinline", "");
-        video.src = src;
 
         video.addEventListener(
           "loadedmetadata",
@@ -371,6 +370,31 @@ export function ScrollScrub({
             segment.ready = true;
             segment.loading = false;
             dirty = true;
+
+            if (!playMode()) {
+              // Force one seek so the decoder commits a frame.
+              //
+              // At the top of the page the first chapter sits at target 0, and
+              // the scrub loop only writes currentTime once it differs from the
+              // current position by more than epsilon — so at rest it never
+              // writes at all, and no seek is ever issued. Blink papers over
+              // that by painting frame 0 of a loaded video by itself; WebKit
+              // does not commit a frame for a video that has neither played nor
+              // completed a seek, so in Safari the first chapter stayed blank
+              // until the visitor scrolled.
+              //
+              // The floor has to be non-zero: assigning 0 to a currentTime that
+              // is already 0 is not a seek and fires nothing. At 24 fps, 1 ms is
+              // still inside frame 0, so the frame shown is the poster's own.
+              try {
+                video.currentTime = Math.max(
+                  clamp(segment.target, 0, 0.999) * (video.duration || 1),
+                  0.001
+                );
+              } catch {
+                // Not seekable yet; the scroll loop issues the next one.
+              }
+            }
           },
           { once: true }
         );
@@ -419,7 +443,12 @@ export function ScrollScrub({
         video.addEventListener("seeked", markPainted, { once: true });
         video.addEventListener("playing", markPainted, { once: true });
 
+        // In the DOM before `src`, so the media load algorithm runs on an
+        // attached element — WebKit has historically been particular about
+        // loading a detached one. Both happen in the same synchronous block,
+        // so no media event can arrive between them.
         segment.layer.append(video);
+        video.src = src;
         if (objectUrl) {
           segment.objectUrl = objectUrl;
         }
