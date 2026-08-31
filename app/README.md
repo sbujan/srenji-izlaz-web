@@ -1,8 +1,8 @@
 # Srednji izlaz d.o.o. — website
 
 Marketing site for a Croatian construction and real-estate company: a
-scroll-driven landing page, property listings (`/oglasi`) and careers
-(`/karijera`), in Croatian with an English toggle.
+scroll-driven landing page and the company's job adverts (`/oglasi`), in
+Croatian with an English toggle.
 
 ## Stack
 
@@ -14,11 +14,12 @@ scroll-driven landing page, property listings (`/oglasi`) and careers
 | Build     | Vite 8, TypeScript                                           |
 | Hosting   | Vercel, served as static files                               |
 
-Every page is **prerendered to static HTML at build time**. There is no server,
-no database and no API: the only runtime behaviour (language toggle, scroll
-journey, reveal animations) runs in the browser. Vercel serves the output from
-its CDN, so there are no serverless functions to pay for or keep warm, and
-crawlers receive fully rendered markup.
+Every page is **prerendered to static HTML at build time** and served from
+Vercel's CDN, so crawlers receive fully rendered markup and there is nothing to
+keep warm. There is no database. The single exception is `POST /api/contact`,
+which delivers the contact and job-application forms; everything else — the
+language toggle, the scroll journey, the reveal animations — runs in the
+browser.
 
 ## Local development
 
