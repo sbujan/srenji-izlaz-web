@@ -42,6 +42,16 @@
   opacity: 1;
 }
 
+/* Film mode (phones): one continuous clip in the first layer carries the whole
+   journey, so the other layers are dead weight — hiding them keeps the phone
+   from compositing extra fullscreen surfaces and, because their posters are
+   loading="lazy", stops those from being fetched at all. The attribute is set
+   by the controller and removed if the film fails, which brings the layers
+   back as per-chapter posters. */
+.scroll-scrub[data-film-mode="true"] .scroll-scrub__layer + .scroll-scrub__layer {
+  display: none;
+}
+
 .scroll-scrub__poster,
 .scroll-scrub__video {
   display: block;

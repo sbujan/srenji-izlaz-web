@@ -45,12 +45,31 @@ export interface ScrollScrubTheme {
   accent: string;
 }
 
+/**
+ * One continuous film for phones, replacing the per-chapter clips there.
+ *
+ * The chapter clips are cuts of a single unbroken shot, and playing each from
+ * its own zero means the world jumps forward at every seam unless the visitor
+ * waits out the full clip. A single element playing one file makes continuity
+ * structural: arriving at chapter i extends the playback target to
+ * `chapterEnds[i]` and the film simply keeps going — it can never jump, and
+ * only one video is ever decoded and composited. `chapterEnds` are the
+ * source-time boundaries between chapters, in seconds, ending at the film's
+ * duration. Pass a module-level constant: the controller effect re-initialises
+ * when this prop's identity changes.
+ */
+export interface ScrollScrubMobileFilm {
+  src: string;
+  chapterEnds: number[];
+}
+
 export interface ScrollScrubProps {
   scenes: ScrollScrubScene[];
   /** Leave empty for continuous-forward architecture A. */
   connectors?: (ScrollScrubConnector | null)[];
   theme: ScrollScrubTheme;
   className?: string;
+  mobileFilm?: ScrollScrubMobileFilm;
   onActiveSectionChange?: (index: number) => void;
 }
 
@@ -173,6 +192,7 @@ export function ScrollScrub({
   connectors,
   theme,
   className,
+  mobileFilm,
   onActiveSectionChange,
 }: ScrollScrubProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -225,8 +245,29 @@ export function ScrollScrub({
      * Desktop keeps the scrub. See the mobile block in scroll-scrub.css.
      */
     const playMode = () => isMobile() && !reduceMotion;
-    const sourceFor = (segment: RuntimeSegment) =>
-      isMobile() && segment.mobileClip ? segment.mobileClip : segment.clip;
+    /**
+     * Film mode: one continuous clip in the first layer carries the whole
+     * journey (see ScrollScrubMobileFilm). `filmFailed` drops just the visual
+     * part — the other layers come back and show their per-chapter posters, the
+     * same degraded state reduced-motion visitors get — while loading stays in
+     * film mode so nothing tries to fetch the departed per-chapter clips.
+     */
+    let filmFailed = false;
+    const filmMode = () => playMode() && Boolean(mobileFilm);
+    const filmVisual = () => filmMode() && !filmFailed;
+    const syncFilmAttr = () => {
+      if (filmVisual()) {
+        root.dataset.filmMode = "true";
+      } else {
+        delete root.dataset.filmMode;
+      }
+    };
+    const sourceFor = (segment: RuntimeSegment) => {
+      if (filmMode()) {
+        return segment === runtime[0] ? (mobileFilm?.src ?? "") : "";
+      }
+      return isMobile() && segment.mobileClip ? segment.mobileClip : segment.clip;
+    };
     const runtime: RuntimeSegment[] = segments.map((segment, index) => ({
       ...segment,
       band: bandNodes[index],
@@ -243,6 +284,8 @@ export function ScrollScrub({
 
     let active = -1;
     let activeSegment = -1;
+    /** Film mode: source-time the film may play up to before pausing. */
+    let filmTarget = 0;
     let destroyed = false;
     let dirty = true;
     let frame = 0;
@@ -289,6 +332,7 @@ export function ScrollScrub({
         segment.end = segment.start + rect.height;
       }
       total = Math.max(runtime.at(-1)?.end ?? viewportHeight, viewportHeight);
+      syncFilmAttr();
       dirty = true;
     };
 
@@ -428,6 +472,13 @@ export function ScrollScrub({
             segment.ready = false;
             delete segment.layer.dataset.videoPainted;
             segment.layer.dataset.videoFailed = "true";
+            if (filmMode() && segment === runtime[0]) {
+              // The film is the only video on phones; losing it falls back to
+              // the per-chapter posters (the reduced-motion look).
+              filmFailed = true;
+              syncFilmAttr();
+              dirty = true;
+            }
           },
           { once: true }
         );
@@ -495,6 +546,13 @@ export function ScrollScrub({
         if (reduceMotion) {
           opacity = outside === 0 ? 1 : 0;
         }
+        // One element carries the whole film, so there is no crossfade: the
+        // first layer is the picture, always. Without this pin, both layers at
+        // a chapter boundary hold opacity 1 and the phone composites two
+        // fullscreen videos as its resting state.
+        if (filmVisual()) {
+          opacity = index === 0 ? 1 : 0;
+        }
 
         segment.visible = opacity > 0.001;
         segment.layer.style.opacity = String(opacity);
@@ -531,8 +589,56 @@ export function ScrollScrub({
       if (activeSegment !== currentIndex) {
         activeSegment = currentIndex;
       }
-      if (playMode()) {
+      if (filmVisual()) {
+        updateFilm();
+      } else if (playMode()) {
         updatePlayback();
+      }
+    };
+
+    /**
+     * Film driver, dirty frames only. Forward-only: arriving at a chapter
+     * extends the playback target to that chapter's end and the film keeps
+     * going from wherever it is — world time never jumps at a seam, which is
+     * the whole point of the single file. Moving backwards is the one seek:
+     * replay that chapter's phase from its first frame. Idempotent per frame,
+     * so it also catches the film becoming ready under a chapter that is
+     * already on screen, and retries a play() the platform refused once the
+     * first gesture arrives.
+     */
+    const updateFilm = () => {
+      const segment = runtime[0];
+      const { video } = segment;
+      const ends = mobileFilm?.chapterEnds ?? [];
+      if (!video || !segment.ready || ends.length === 0) {
+        return;
+      }
+      const chapter = Math.min(
+        runtime[activeSegment]?.sectionIndex ?? 0,
+        ends.length - 1
+      );
+      const target = ends[chapter];
+      if (target < filmTarget - 0.05) {
+        const start = chapter === 0 ? 0.001 : ends[chapter - 1];
+        try {
+          video.currentTime = start;
+        } catch {
+          // Not seekable yet; playing on from here still looks continuous.
+        }
+      }
+      filmTarget = target;
+      if (video.paused && video.currentTime < filmTarget - 0.05) {
+        void video.play().catch(() => {
+          // Autoplay refused (iOS Low Power Mode). onFirstGesture retries.
+        });
+      }
+    };
+
+    /** Every frame: stop on the active chapter's end frame. */
+    const holdFilmAtTarget = () => {
+      const { video } = runtime[0];
+      if (video && !video.paused && video.currentTime >= filmTarget - 0.02) {
+        video.pause();
       }
     };
 
@@ -614,6 +720,9 @@ export function ScrollScrub({
         readScroll();
       }
       updateVideos();
+      if (filmVisual()) {
+        holdFilmAtTarget();
+      }
       frame = window.requestAnimationFrame(tick);
     };
 
@@ -631,6 +740,12 @@ export function ScrollScrub({
         return;
       }
       userReady = true;
+      if (filmVisual()) {
+        // updateFilm retries the play() the platform refused before a gesture;
+        // primeVideo's play-then-pause would stop a film already in flight.
+        dirty = true;
+        return;
+      }
       for (const segment of runtime) {
         void primeVideo(segment.video);
       }
@@ -686,6 +801,7 @@ export function ScrollScrub({
       window.removeEventListener("touchstart", onFirstGesture);
       root.style.removeProperty("--ss-progress");
       delete root.dataset.activeSection;
+      delete root.dataset.filmMode;
 
       for (const segment of runtime) {
         unloadClip(segment);
@@ -693,7 +809,7 @@ export function ScrollScrub({
         segment.layer.style.removeProperty("z-index");
       }
     };
-  }, [segments]);
+  }, [segments, mobileFilm]);
 
   if (scenes.length === 0) {
     return null;

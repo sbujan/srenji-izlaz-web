@@ -6,7 +6,12 @@ import { ContactReveal } from "@/components/site/contact-reveal";
 import { Reveal } from "@/components/site/reveal";
 import { ScrollScrub } from "@/components/scroll-scrub/scroll-scrub";
 import { useLang, type Lang } from "@/lib/i18n";
-import { scrollScrubScenesEn, scrollScrubScenesHr, scrollScrubTheme } from "@/scroll-scrub-scenes";
+import {
+  scrollScrubMobileFilm,
+  scrollScrubScenesEn,
+  scrollScrubScenesHr,
+  scrollScrubTheme,
+} from "@/scroll-scrub-scenes";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -88,7 +93,7 @@ function Index() {
     <div className="si-page">
       <SiteNav />
       <main>
-        <ScrollScrub scenes={scenes} theme={scrollScrubTheme} />
+        <ScrollScrub mobileFilm={scrollScrubMobileFilm} scenes={scenes} theme={scrollScrubTheme} />
 
         <section className="si-section" id="usluge">
           <div className="si-container">

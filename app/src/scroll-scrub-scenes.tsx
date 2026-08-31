@@ -10,9 +10,21 @@
  * only when the visitor toggles the language.
  */
 import type {
+  ScrollScrubMobileFilm,
   ScrollScrubScene,
   ScrollScrubTheme,
 } from "@/components/scroll-scrub/scroll-scrub";
+
+/**
+ * Phones play this single continuous encode of the whole shot instead of the
+ * three per-chapter cuts — one element, no seams, forward-only playback.
+ * chapterEnds are the source-time cut points measured from the deployed file
+ * (2.000 s + 2.000 s + 2.042 s segments).
+ */
+export const scrollScrubMobileFilm: ScrollScrubMobileFilm = {
+  src: "/assets/world/scene-full-mobile.mp4",
+  chapterEnds: [2.0, 4.0, 6.042],
+};
 
 /** Brand tokens for the journey layer (design-brief.md). */
 export const scrollScrubTheme: ScrollScrubTheme = {
@@ -50,7 +62,6 @@ export const scrollScrubScenesHr: ScrollScrubScene[] = [
     kicker: "Srednji izlaz d.o.o.",
     label: "Temelj",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-01-mobile.mp4",
     mobilePoster: "/assets/world/scene-01-mobile-poster.jpg",
     poster: "/assets/world/scene-01-poster.jpg",
     scroll: 2,
@@ -65,7 +76,6 @@ export const scrollScrubScenesHr: ScrollScrubScene[] = [
     kicker: "Građevinski radovi",
     label: "Gradnja",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-02-mobile.mp4",
     mobilePoster: "/assets/world/scene-02-mobile-poster.jpg",
     poster: "/assets/world/scene-02-poster.jpg",
     scroll: 2,
@@ -80,7 +90,6 @@ export const scrollScrubScenesHr: ScrollScrubScene[] = [
     kicker: "Nekretnine",
     label: "Nekretnine",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-03-mobile.mp4",
     mobilePoster: "/assets/world/scene-03-mobile-poster.jpg",
     poster: "/assets/world/scene-03-poster.jpg",
     scroll: 2,
@@ -96,7 +105,6 @@ export const scrollScrubScenesEn: ScrollScrubScene[] = [
     kicker: "Srednji izlaz d.o.o.",
     label: "Foundation",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-01-mobile.mp4",
     mobilePoster: "/assets/world/scene-01-mobile-poster.jpg",
     poster: "/assets/world/scene-01-poster.jpg",
     scroll: 2,
@@ -111,7 +119,6 @@ export const scrollScrubScenesEn: ScrollScrubScene[] = [
     kicker: "Construction works",
     label: "Construction",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-02-mobile.mp4",
     mobilePoster: "/assets/world/scene-02-mobile-poster.jpg",
     poster: "/assets/world/scene-02-poster.jpg",
     scroll: 2,
@@ -126,7 +133,6 @@ export const scrollScrubScenesEn: ScrollScrubScene[] = [
     kicker: "Real estate",
     label: "Real estate",
     linger: 0.15,
-    mobileClip: "/assets/world/scene-03-mobile.mp4",
     mobilePoster: "/assets/world/scene-03-mobile-poster.jpg",
     poster: "/assets/world/scene-03-poster.jpg",
     scroll: 2,

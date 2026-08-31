@@ -133,6 +133,15 @@
   letter-spacing: 0.34em;
   white-space: nowrap;
 }
+/* A live backdrop blur over a playing video re-samples every frame on the
+   phone GPU — one of the measured lag sources in the film. The gradient is
+   ~96% opaque where the links sit, so legibility holds without it. */
+@media (max-width: 860px) {
+  .si-nav {
+    backdrop-filter: none;
+  }
+}
+
 @media (max-width: 640px) {
   .si-logo-word {
     letter-spacing: 0.2em;
