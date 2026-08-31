@@ -18,7 +18,7 @@ export function SiteNav() {
   return (
     <header className="si-nav">
       <div className="si-container si-nav-inner">
-        <Link to="/" aria-label="Srednji izlaz">
+        <Link to="/">
           <Logo />
         </Link>
         <nav className="si-nav-links" aria-label="Main">

@@ -115,23 +115,15 @@
 
 /* ---------- logo ---------- */
 
+/* The supplied lockup image; height controls the whole mark. `max-width: none`
+   opts out of the global `img { max-width: 100% }` reset — inside the nav's
+   flex row that rule let a tight viewport squeeze the logo narrower than its
+   aspect ratio instead of letting it hold shape. */
 .si-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: var(--si-ink);
-  text-decoration: none;
-}
-.si-logo svg {
-  height: 1.9rem;
+  display: block;
+  height: 2.6rem;
   width: auto;
-  flex: none;
-}
-.si-logo-word {
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.34em;
-  white-space: nowrap;
+  max-width: none;
 }
 /* A live backdrop blur over a playing video re-samples every frame on the
    phone GPU — one of the measured lag sources in the film. The gradient is
@@ -143,9 +135,8 @@
 }
 
 @media (max-width: 640px) {
-  .si-logo-word {
-    letter-spacing: 0.2em;
-    font-size: 0.85rem;
+  .si-logo {
+    height: 2.2rem;
   }
   .si-nav-links {
     gap: 0.75rem;
@@ -158,14 +149,18 @@
   }
 }
 
-/* Narrower than this the wordmark, the three links and the language toggle stop
-   fitting on one row: the wordmark runs under the links and the toggle is cut
-   off past the right edge, which also makes the whole page scroll sideways. The
-   logo mark alone carries the brand below it and still links home (the anchor
-   keeps its aria-label, so the name is unchanged for screen readers). */
-@media (max-width: 540px) {
-  .si-logo-word {
-    display: none;
+/* The 320px class of phones: with the logo no longer allowed to squeeze, the
+   row needs genuinely smaller parts to fit. */
+@media (max-width: 380px) {
+  .si-logo {
+    height: 1.9rem;
+  }
+  .si-nav-links {
+    gap: 0.55rem;
+  }
+  .si-nav-link {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
   }
 }
 
