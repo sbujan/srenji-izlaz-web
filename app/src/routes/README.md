@@ -18,6 +18,6 @@ is `src/routes/__root.tsx`.
 | `_layout.tsx`            | layout route (renders children via `<Outlet />`)        |
 | `__root.tsx`             | app shell — wraps every page; preserve `<Outlet />`     |
 
-`routeTree.gen.ts` is auto-generated. Don't edit it by hand. `bun run
-typecheck` and `bun run build` regenerate it first (`tsr generate`), so newly
+`routeTree.gen.ts` is auto-generated. Don't edit it by hand. `npm run
+typecheck` and `npm run build` regenerate it first (`tsr generate`), so newly
 added routes typecheck cleanly right away.

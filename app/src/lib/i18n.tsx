@@ -20,10 +20,16 @@ const LangContext = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("hr");
 
+  // Deliberate: the pages are prerendered as Croatian at build time, so the
+  // saved language can only be applied after hydration — reading localStorage
+  // during render would make the client's first paint disagree with the HTML
+  // and break hydration. The one extra render on load is the cost of that
+  // correctness, so the cascading-render rule is suppressed here on purpose.
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("si-lang");
       if (saved === "en" || saved === "hr") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLangState(saved);
       }
     } catch {

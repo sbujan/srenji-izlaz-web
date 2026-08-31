@@ -109,6 +109,26 @@
     letter-spacing: 0.2em;
     font-size: 0.85rem;
   }
+  .si-nav-links {
+    gap: 0.75rem;
+  }
+  .si-nav-link {
+    font-size: 0.82rem;
+  }
+  .si-lang button {
+    padding: 0.35rem 0.45rem;
+  }
+}
+
+/* Narrower than this the wordmark, the three links and the language toggle stop
+   fitting on one row: the wordmark runs under the links and the toggle is cut
+   off past the right edge, which also makes the whole page scroll sideways. The
+   logo mark alone carries the brand below it and still links home (the anchor
+   keeps its aria-label, so the name is unchanged for screen readers). */
+@media (max-width: 540px) {
+  .si-logo-word {
+    display: none;
+  }
 }
 
 /* ---------- reveal (text rises bottom to top; transform-only, screenshot-safe) ---------- */

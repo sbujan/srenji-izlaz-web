@@ -125,6 +125,13 @@
   z-index: 3;
   margin-top: -100dvh;
   pointer-events: none;
+  /* The chapter scrim (.scroll-scrub__copy::before) is deliberately inset by a
+     negative margin so the gradient bleeds past the text. On narrow viewports
+     that bleed runs wider than the screen and the whole page scrolls sideways.
+     `clip` trims it at the edge — where the gradient has already faded out, so
+     nothing visible is lost. It must not be `hidden`: that would make this a
+     scroll container and break the sticky pinning the scrub depends on. */
+  overflow-x: clip;
 }
 
 .scroll-scrub__chapter,
