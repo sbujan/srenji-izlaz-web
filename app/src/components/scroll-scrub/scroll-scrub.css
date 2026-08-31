@@ -232,6 +232,21 @@
 }
 
 @media (max-width: 860px) {
+  /* One chapter, one screenful, one swipe.
+     The height is an inline style from the scene's `scroll` weight (200dvh
+     here), so overriding it needs !important — the same lever the
+     reduced-motion block below already pulls. At 100dvh the sticky pin has no
+     travel left, which is the point: the chapter no longer drifts through two
+     screens, it is simply the screen, and the snap below holds it there while
+     the clip plays. */
+  .scroll-scrub__chapter {
+    min-height: 100dvh !important;
+    scroll-snap-align: start;
+    /* Without this a fast flick sails through two or three chapters, which is
+       exactly the behaviour being fixed. */
+    scroll-snap-stop: always;
+  }
+
   .scroll-scrub__poster,
   .scroll-scrub__video {
     object-position: var(--ss-mobile-position);

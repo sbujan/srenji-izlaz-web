@@ -106,3 +106,32 @@ button {
   outline: 2px solid var(--si-accent-hi);
   outline-offset: 2px;
 }
+
+/* Snap the film's chapters on phones so one swipe advances one chapter.
+ *
+ * The snap container has to be the document — the chapters are laid out in the
+ * page flow, not inside a scroller — so this is scoped to the mobile breakpoint
+ * and paired with `scroll-snap-align` on the chapters themselves and on the
+ * first section after the film. Sections with no alignment are not snap targets,
+ * so the rest of the page scrolls normally; giving the section below the film an
+ * alignment just means leaving the last chapter lands somewhere deliberate
+ * instead of on a mandatory container with no target in range.
+ *
+ * `scroll-snap-type` is not an overflow property, so it does not create a scroll
+ * container and the sticky pinning the film depends on is unaffected. */
+@media (max-width: 860px) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+  .si-page > main > .si-section:first-of-type {
+    scroll-snap-align: start;
+  }
+}
+
+/* A visitor who asked for less motion gets the still-image journey instead, and
+   snapping a page under them is exactly the kind of movement they opted out of. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+  }
+}

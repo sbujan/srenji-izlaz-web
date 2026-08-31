@@ -82,6 +82,8 @@ interface RuntimeSegment extends Segment {
   ready: boolean;
   failed: boolean;
   loadedSource?: string;
+  /** Play mode only: this chapter's clip has been started for this arrival. */
+  played?: boolean;
   video?: HTMLVideoElement;
   objectUrl?: string;
   abort?: AbortController;
@@ -216,6 +218,13 @@ export function ScrollScrub({
     ).matches;
     const smallViewport = window.matchMedia("(max-width: 860px)");
     const isMobile = () => coarsePointer || smallViewport.matches;
+    /**
+     * On a phone each chapter is one screenful that the visitor snaps to, and
+     * the clip simply plays when it lands — dragging a video frame-by-frame
+     * with a finger is expensive to decode and fights inertial scrolling.
+     * Desktop keeps the scrub. See the mobile block in scroll-scrub.css.
+     */
+    const playMode = () => isMobile() && !reduceMotion;
     const sourceFor = (segment: RuntimeSegment) =>
       isMobile() && segment.mobileClip ? segment.mobileClip : segment.clip;
     const runtime: RuntimeSegment[] = segments.map((segment, index) => ({
@@ -233,6 +242,7 @@ export function ScrollScrub({
     }));
 
     let active = -1;
+    let activeSegment = -1;
     let destroyed = false;
     let dirty = true;
     let frame = 0;
@@ -255,6 +265,7 @@ export function ScrollScrub({
       segment.loading = false;
       segment.ready = false;
       segment.failed = false;
+      segment.played = false;
       segment.current = segment.target;
       delete segment.layer.dataset.videoPainted;
       delete segment.layer.dataset.videoFailed;
@@ -312,30 +323,44 @@ export function ScrollScrub({
       const request = segment.abort;
 
       try {
-        const response = await fetch(source, {
-          signal: request.signal,
-        });
-        if (!response.ok) {
-          throw new Error(`Clip failed: ${response.status}`);
-        }
-        const blob = await response.blob();
-        if (
-          destroyed ||
-          request.signal.aborted ||
-          segment.loadedSource !== source
-        ) {
-          return;
+        let src = source;
+        let objectUrl: string | undefined;
+
+        // Scrubbing writes currentTime every frame, and iOS will not seek an
+        // HTTP-streamed MP4 accurately, so that path still has to download the
+        // whole clip into a blob before the first frame is usable. Playback has
+        // no such constraint: streaming lets a frame paint almost immediately
+        // instead of after megabytes have landed.
+        if (!playMode()) {
+          const response = await fetch(source, {
+            signal: request.signal,
+          });
+          if (!response.ok) {
+            throw new Error(`Clip failed: ${response.status}`);
+          }
+          const blob = await response.blob();
+          if (
+            destroyed ||
+            request.signal.aborted ||
+            segment.loadedSource !== source
+          ) {
+            return;
+          }
+          objectUrl = URL.createObjectURL(blob);
+          src = objectUrl;
         }
 
-        const objectUrl = URL.createObjectURL(blob);
         const video = document.createElement("video");
         video.className = "scroll-scrub__video";
         video.muted = true;
         video.playsInline = true;
+        // "auto" in both modes. Metadata-only made sense against the old
+        // multi-megabyte encodes, but a ~0.5 MiB clip is cheap to buffer, and
+        // holding back means the chapter is reached before it can play.
         video.preload = "auto";
         video.setAttribute("muted", "");
         video.setAttribute("playsinline", "");
-        video.src = objectUrl;
+        video.src = src;
 
         video.addEventListener(
           "loadedmetadata",
@@ -369,7 +394,9 @@ export function ScrollScrub({
               return;
             }
             video.remove();
-            URL.revokeObjectURL(objectUrl);
+            if (objectUrl) {
+              URL.revokeObjectURL(objectUrl);
+            }
             delete segment.video;
             delete segment.objectUrl;
             segment.failed = true;
@@ -380,18 +407,22 @@ export function ScrollScrub({
           },
           { once: true }
         );
-        video.addEventListener(
-          "seeked",
-          () => {
-            if (segment.video === video && segment.loadedSource === source) {
-              segment.layer.dataset.videoPainted = "true";
-            }
-          },
-          { once: true }
-        );
+        // Hand over from poster to video as soon as a real frame is up. Which
+        // event gets there first depends on the mode: scrubbing paints by
+        // seeking, playback by playing — and a play that starts at 0 need not
+        // fire "seeked" at all, so both are wired and whichever fires wins.
+        const markPainted = () => {
+          if (segment.video === video && segment.loadedSource === source) {
+            segment.layer.dataset.videoPainted = "true";
+          }
+        };
+        video.addEventListener("seeked", markPainted, { once: true });
+        video.addEventListener("playing", markPainted, { once: true });
 
         segment.layer.append(video);
-        segment.objectUrl = objectUrl;
+        if (objectUrl) {
+          segment.objectUrl = objectUrl;
+        }
         segment.video = video;
       } catch (error) {
         if (
@@ -464,9 +495,61 @@ export function ScrollScrub({
       }
 
       root.style.setProperty("--ss-progress", String(clamp(y / total)));
+
+      // Cheap: readScroll only runs on a dirty frame, and a clip reaching
+      // `loadedmetadata` sets dirty, so a chapter that becomes ready while it is
+      // already on screen still gets started.
+      if (activeSegment !== currentIndex) {
+        activeSegment = currentIndex;
+      }
+      if (playMode()) {
+        updatePlayback();
+      }
+    };
+
+    /**
+     * Playback driver for mobile. The chapter that is on screen plays from the
+     * start; everything else is paused and rewound so swiping back replays it
+     * rather than resuming a half-finished clip. Runs only when the active
+     * chapter changes, not every frame.
+     */
+    const updatePlayback = () => {
+      for (const [index, segment] of runtime.entries()) {
+        const { video } = segment;
+        if (!video || !segment.ready) {
+          continue;
+        }
+        if (index === activeSegment) {
+          // Start once per arrival. Keying off `video.paused` instead would
+          // restart the clip every time the chapter is nudged after it has
+          // played out, since a finished video reports itself as paused.
+          if (!segment.played) {
+            segment.played = true;
+            try {
+              video.currentTime = 0;
+            } catch {
+              // A clip still buffering rejects the rewind; it plays from
+              // wherever it is, which beats not playing at all.
+            }
+            void video.play().catch(() => {
+              // Autoplay refused (rare for muted + playsinline). Poster stays.
+            });
+          }
+        } else {
+          if (!video.paused) {
+            video.pause();
+          }
+          // Armed again, so swiping back replays the chapter from its first
+          // frame rather than showing the frame it ended on.
+          segment.played = false;
+        }
+      }
     };
 
     const updateVideos = () => {
+      if (playMode()) {
+        return;
+      }
       for (const segment of runtime) {
         const { video } = segment;
         if (!video || !segment.ready || video.seeking) {
@@ -545,6 +628,11 @@ export function ScrollScrub({
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     window.addEventListener("orientationchange", layout);
+    // Crossing the mobile breakpoint changes the chapter height (see the
+    // `100dvh !important` rule in scroll-scrub.css) and the play/scrub mode, but
+    // onResize deliberately ignores height-only changes on coarse pointers, so
+    // the breakpoint itself has to force the re-measure.
+    smallViewport.addEventListener("change", layout);
     window.addEventListener("pointerdown", onFirstGesture, {
       once: true,
       passive: true,
@@ -564,6 +652,7 @@ export function ScrollScrub({
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", layout);
+      smallViewport.removeEventListener("change", layout);
       window.removeEventListener("pointerdown", onFirstGesture);
       window.removeEventListener("touchstart", onFirstGesture);
       root.style.removeProperty("--ss-progress");
@@ -619,7 +708,13 @@ export function ScrollScrub({
                     alt=""
                     className="scroll-scrub__poster"
                     decoding="async"
-                    fetchPriority={index === 0 ? "high" : "auto"}
+                    // Every layer is absolutely positioned inside the sticky
+                    // stage, so all of them count as in-viewport and `lazy`
+                    // cannot defer the later posters. Demoting them is what
+                    // actually keeps them from racing the first chapter's clip
+                    // for bandwidth — they are not looked at until their
+                    // chapter is reached.
+                    fetchPriority={index === 0 ? "high" : "low"}
                     loading={index === 0 ? "eager" : "lazy"}
                     src={segment.poster}
                   />

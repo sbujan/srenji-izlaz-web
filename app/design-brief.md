@@ -34,24 +34,34 @@
        niskogradnja/visokogradnja, Ključ u ruke / Roh-bau. Tags: Ključ u ruke,
        Roh-bau.
     3. `nekretnine` — finished, landscaped complex. Headline: real estate.
-       CTA: view listings (/oglasi).
+       CTA: send an inquiry (#kontakt) — the company brokers property but
+       publishes no listings index.
   - **World grammar:** one continuous photoreal aerial render, daylight, fixed
     exposure, forest-green surround; chapters read over it left-aligned with a
     dark scrim side.
   - **Mobile framing:** subject is center-safe (buildings centered); mobile
     encodes 720p center-crop via object-position 50%.
-  - **Delivery budget:** ≤32 MiB desktop total, ≤16 MiB mobile total (source is
-    5s, trivially inside budget).
+  - **Mobile playback:** phones do NOT scrub. Each chapter is one screenful the
+    visitor snaps to and the clip plays on arrival — dragging video frames with
+    a finger decodes expensively and fights inertial scrolling. Desktop keeps
+    the scrub. One swipe, one chapter, one text block.
+  - **Delivery budget:** ≤32 MiB desktop, **≤3 MB mobile page total**. The
+    original ≤16 MiB mobile ceiling was loose enough to call a 9.8 MiB journey
+    healthy, which it was not — a phone waited seconds before anything moved.
+    Mobile now ships ~1.9 MiB of film (three ~0.5 MiB clips plus posters) and
+    plays rather than scrubs, so the clips no longer need the short keyframe
+    interval and the whole-file blob download that frame-accurate seeking forced.
 - **Section plan (home, after journey):**
   1. Journey (3 scrub chapters) — full-viewport film.
   2. Services — asymmetric 2-block split (construction / real estate), each with
      generated monochrome image; distinct layouts, not equal cards.
-  3. About — editorial single column narrative + company facts sidebar
-     (OIB/MBS/director/address) in mono type.
-  4. Contact strip / footer — email CTA + address + language switch.
-- **Separate pages:** `/oglasi` (real-estate listings grid, sample entries until
-  client supplies real ones) and `/karijera` (job ads list, open-application
-  block). Both bilingual.
+  3. About — narrative one side, image the other; company registration data as
+     a full-width band beneath, in mono type.
+  4. Contact — Ivan Pranjić's details one side, inquiry form the other, then the
+     legal row.
+- **Separate pages:** `/oglasi` — "Oglasi za posao", the company's real job
+  adverts (three trades, employer benefits, application form), bilingual.
+  `/karijera` was removed as a duplicate and permanently redirects to `/oglasi`.
 - **Bilingual:** HR default, EN toggle in nav (persisted client-side); two
   stable scene constants (HR/EN) so the scrub controller identity changes only
   on user toggle.
@@ -60,11 +70,11 @@
   ground); 3 generated monochrome content images (crane/site, finished facade,
   careers team/site detail); OG cover + favicon via branding pipeline.
 - **CTA inventory:**
-  - "Pogledaj oglase / View listings" — solid blue rectangle, label slides up on
-    hover (journey ch.3 + services real-estate block).
-  - "Pošalji upit / Send an inquiry" — outline with animated underline reveal
-    (contact strip, mailto).
-  - "Otvorene pozicije / Open positions" — mono text link with arrow shift
-    (nav + karijera).
+  - "Pošalji upit / Send an inquiry" — solid blue rectangle, label slides up on
+    hover (journey ch.3 + services real-estate block, both to #kontakt).
+  - "Prijavi se / Apply" — solid blue rectangle per job advert; preselects that
+    trade in the application form and scrolls to it.
+  - "Prikaži e-mail / Show e-mail" — mono outline button; contact details are
+    assembled in the browser on click so they never sit in the prerendered HTML.
 - **Eyebrow budget:** max 2 across the page (journey kickers excluded, they are
   chapter kickers by engine design).
