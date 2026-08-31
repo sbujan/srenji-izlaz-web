@@ -143,15 +143,14 @@ function Index() {
         </section>
 
         <section className="si-section si-section--tint" id="o-nama">
-          <div className="si-container si-about">
-            <div>
-              <Reveal>
+          <div className="si-container">
+            <div className="si-about">
+              <Reveal className="si-about-text">
                 <h2 className="si-h2">{t.aboutTitle}</h2>
                 <p className="si-lead">{t.aboutBody1}</p>
-                <br />
                 <p className="si-lead">{t.aboutBody2}</p>
               </Reveal>
-              <Reveal delay={120}>
+              <Reveal className="si-about-media" delay={120}>
                 <img
                   alt="Srednji izlaz"
                   className="si-about-img"
@@ -162,6 +161,9 @@ function Index() {
                 />
               </Reveal>
             </div>
+            {/* Registration data only. The address, e-mail and phone live in the
+                contact block, and repeating them here was the duplication that
+                made this section read as a sidebar of loose ends. */}
             <Reveal className="si-facts" delay={60}>
               <dl>
                 <div className="si-fact">
@@ -169,8 +171,8 @@ function Index() {
                   <dd>Ivan Pranjić</dd>
                 </div>
                 <div className="si-fact">
-                  <dt>{t.factAddress}</dt>
-                  <dd>Mokrička 26, 10298 Donja Bistra</dd>
+                  <dt>{t.factFounded}</dt>
+                  <dd>2016.</dd>
                 </div>
                 <div className="si-fact">
                   <dt>OIB</dt>
@@ -181,20 +183,8 @@ function Index() {
                   <dd>081070237</dd>
                 </div>
                 <div className="si-fact">
-                  <dt>{t.factEmail}</dt>
-                  <dd>
-                    <ContactReveal kind="email" />
-                  </dd>
-                </div>
-                <div className="si-fact">
-                  <dt>{t.factPhone}</dt>
-                  <dd>
-                    <ContactReveal kind="phone" />
-                  </dd>
-                </div>
-                <div className="si-fact">
-                  <dt>{t.factFounded}</dt>
-                  <dd>2016.</dd>
+                  <dt>{t.factAddress}</dt>
+                  <dd>Mokrička 26, 10298 Donja Bistra</dd>
                 </div>
               </dl>
             </Reveal>

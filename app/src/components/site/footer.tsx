@@ -10,9 +10,9 @@ const copy: Record<
   {
     ctaTitle: string;
     ctaBody: string;
+    person: string;
+    role: string;
     address: string;
-    contact: string;
-    director: string;
     email: string;
     phone: string;
     rights: string;
@@ -22,9 +22,9 @@ const copy: Record<
     ctaTitle: "Imate projekt ili upit?",
     ctaBody:
       "Opišite nam ukratko što planirate — javljamo se s procjenom i sljedećim koracima.",
+    person: "Ivan Pranjić",
+    role: "Direktor",
     address: "Adresa",
-    contact: "Kontakt",
-    director: "direktor",
     email: "E-mail",
     phone: "Telefon",
     rights: "Sva prava pridržana.",
@@ -33,9 +33,9 @@ const copy: Record<
     ctaTitle: "Have a project or an inquiry?",
     ctaBody:
       "Tell us briefly what you're planning — we'll come back with an estimate and the next steps.",
+    person: "Ivan Pranjić",
+    role: "Director",
     address: "Address",
-    contact: "Contact",
-    director: "director",
     email: "E-mail",
     phone: "Phone",
     rights: "All rights reserved.",
@@ -50,29 +50,15 @@ export function SiteFooter() {
     <footer className="si-footer" id="kontakt">
       <div className="si-container">
         <div className="si-footer-cta">
-          <div className="si-footer-cta-intro">
+          <div className="si-contact-card">
             <h2 className="si-h2">{t.ctaTitle}</h2>
             <p className="si-lead">{t.ctaBody}</p>
-          </div>
-          <ContactForm />
-        </div>
-        <div className="si-footer-cols">
-          <div className="si-footer-col">
-            <Logo />
-          </div>
-          <div className="si-footer-col">
-            <h4>{t.address}</h4>
-            <p>
-              Srednji izlaz d.o.o.
-              <br />
-              Mokrička 26
-              <br />
-              10298 Donja Bistra
+
+            <p className="si-contact-person">
+              <strong>{t.person}</strong>
+              <span>{t.role}</span>
             </p>
-          </div>
-          <div className="si-footer-col">
-            <h4>{t.contact}</h4>
-            <p>Ivan Pranjić, {t.director}</p>
+
             <dl className="si-contact-list">
               <div>
                 <dt>{t.email}</dt>
@@ -92,10 +78,22 @@ export function SiteFooter() {
                   <WhatsAppLink />
                 </dd>
               </div>
+              <div>
+                <dt>{t.address}</dt>
+                <dd>
+                  Srednji izlaz d.o.o.
+                  <br />
+                  Mokrička 26, 10298 Donja Bistra
+                </dd>
+              </div>
             </dl>
           </div>
+
+          <ContactForm />
         </div>
+
         <div className="si-footer-legal">
+          <Logo />
           <span>OIB: 69231941942 · MBS: 081070237</span>
           <span>
             © {new Date().getFullYear()} Srednji izlaz d.o.o. {t.rights}
