@@ -615,14 +615,13 @@
    both put two hairlines 3rem apart with nothing between them. */
 .si-footer-cta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  /* Even halves. `minmax(0, 1fr)` rather than plain `1fr` so a long unbroken
+     string in either column cannot push its track past 50%. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: clamp(1.5rem, 5vw, 4rem);
 }
 /* Contact person and details on one side, form on the other. */
-.si-contact-card {
-  max-width: 34rem;
-}
 .si-contact-card .si-lead {
   margin-bottom: 2rem;
 }
@@ -725,7 +724,7 @@
 .si-form {
   display: grid;
   gap: 1rem;
-  width: min(100%, 28rem);
+  width: 100%;
 }
 .si-field {
   display: grid;
@@ -854,9 +853,6 @@
   .si-footer-cta {
     display: grid;
     grid-template-columns: 1fr;
-  }
-  .si-form {
-    width: 100%;
   }
   /* Clear the fixed WhatsApp button, which otherwise sits on top of the
      copyright line once the legal row stacks. */
