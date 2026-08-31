@@ -44,7 +44,7 @@ export const Route = createRootRoute({
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESCRIPTION },
       { name: "twitter:image", content: OG_IMAGE },
-      { name: "theme-color", content: "#0b0c0e" },
+      { name: "theme-color", content: "#ffffff" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -72,7 +72,7 @@ export const Route = createRootRoute({
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="hr" style={{ colorScheme: "dark" }}>
+    <html lang="hr" style={{ colorScheme: "light" }}>
       <head>
         <HeadContent />
       </head>

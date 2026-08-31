@@ -1,14 +1,30 @@
 /* Srednji izlaz d.o.o. — site token layer (design-brief.md).
- * Black / white with the logo blue as the only accent. */
+ * White ground, near-black ink, the logo blue as the only accent. The brief's
+ * off-black is now the ink rather than the ground, so the palette stays the
+ * company's black / white / blue — just inverted.
+ *
+ * The film chapters keep their own dark treatment (see scroll-scrub.css and the
+ * --ss-* theme in scroll-scrub-scenes.tsx): that text sits on top of video, and
+ * light type over a soft dark vignette is the only way it stays legible across
+ * every frame. */
 
 :root {
-  --si-bg: #0b0c0e;
-  --si-bg-2: #101215;
-  --si-ink: #f4f5f7;
-  --si-muted: #9ba1aa;
-  --si-line: #22262c;
+  --si-bg: #ffffff;
+  /* Section tint. Cool rather than warm — it reads as concrete/paper next to
+     the blue, where a warm gray would fight it. */
+  --si-bg-2: #f1f4f7;
+  --si-ink: #0b0c0e;
+  /* Secondary text. 6.3:1 on white — the old #9ba1aa was tuned for a black
+     ground and only reaches 2.3:1 here, which is unreadable. */
+  --si-muted: #5b6169;
+  --si-line: #dde2e8;
   --si-accent: #3866b8;
-  --si-accent-hi: #4a7bd0;
+  /* Emphasis blue for text and links. On black this was a LIGHTER blue; on
+     white it has to go darker to hold contrast (7.7:1). */
+  --si-accent-hi: #2b5194;
+  /* Label colour for the solid blue fills — ink is near-black now and would
+     only reach 2.5:1 on the accent. */
+  --si-on-accent: #ffffff;
   --si-font: "Outfit", system-ui, sans-serif;
   --si-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
@@ -33,8 +49,17 @@
   inset-inline: 0;
   top: 0;
   z-index: 40;
-  background: linear-gradient(to bottom, rgba(11, 12, 14, 0.88), rgba(11, 12, 14, 0));
-  backdrop-filter: blur(2px);
+  /* The bar floats over the film on the home page, so it carries its own
+     ground. It holds the white well past the text baseline before fading, and
+     the blur softens whatever frame is behind it — the dark nav links have to
+     stay readable over bright sky and over shadowed forest alike. */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.88) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  backdrop-filter: blur(6px);
 }
 .si-nav-inner {
   display: flex;
@@ -78,7 +103,7 @@
 }
 .si-lang button[aria-pressed="true"] {
   background: var(--si-accent);
-  color: var(--si-ink);
+  color: var(--si-on-accent);
 }
 .si-lang button:active {
   transform: translateY(1px);
@@ -301,7 +326,7 @@
   overflow: hidden;
   position: relative;
   background: var(--si-accent);
-  color: var(--si-ink);
+  color: var(--si-on-accent);
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: 0.02em;
@@ -397,7 +422,7 @@
   padding-top: clamp(8rem, 16vw, 11rem);
   padding-bottom: clamp(3rem, 6vw, 4.5rem);
   background:
-    radial-gradient(60rem 24rem at 80% -10%, rgba(56, 102, 184, 0.16), transparent 70%),
+    radial-gradient(60rem 24rem at 80% -10%, rgba(56, 102, 184, 0.09), transparent 70%),
     var(--si-bg);
 }
 .si-pagehead .si-lead {

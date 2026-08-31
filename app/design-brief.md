@@ -9,11 +9,16 @@
   phase.
 - **Delivery tier:** cinema (scroll-scrub journey + chapter reveals, text rises
   bottom-to-top).
-- **Locked palette:** ground `#0B0C0E` (off-black), ink `#F4F5F7`, muted
-  `#9BA1AA`, accent `#3866B8` (the exact blue of the client logo; user brand
-  override of the dark+blue ban). Defense: the brand IS black/white/blue by the
-  user's explicit instruction; blue used sparingly as structural accent (logo
-  frame, active states, CTA), never as glow.
+- **Locked palette:** ground `#FFFFFF` (white), section tint `#F1F4F7`, ink
+  `#0B0C0E` (off-black), muted `#5B6169`, accent `#3866B8` (the exact blue of
+  the client logo), emphasis blue `#2B5194`, label-on-accent `#FFFFFF`. The
+  brand is black/white/blue by the client's explicit instruction; blue is used
+  sparingly as a structural accent (logo frame, active states, CTA), never as
+  glow. **Inverted from the original dark ground at the client's request** — the
+  off-black became the ink instead of the ground, and the two greys were retuned
+  for contrast on white (the old `#9BA1AA` muted only reaches 2.3:1 there).
+  Exception: the film chapters keep light type over a dark vignette, because
+  that text sits on video and no light treatment survives every frame.
 - **Locked type:** Outfit (display + body) + IBM Plex Mono (meta, tags, data).
   No serif; construction/engineering brand.
 - **Animation mode:** animated-website

@@ -81,13 +81,18 @@
   transform-origin: left center;
 }
 
+/* Chapter jump-links (Temelj / Gradnja / Nekretnine). Hidden by request: they
+   sat directly under the nav, collided with it at common widths, and read as a
+   half-legible second menu over the moving footage. The chapters are still
+   reached by scrolling, which is the point of the journey. To bring them back,
+   set `display` below to `flex` — the rest of the rule is the original layout. */
 .scroll-scrub__route {
+  display: none;
   position: absolute;
   z-index: 6;
   top: clamp(1rem, 3vw, 2rem);
   right: clamp(1rem, 4vw, 4rem);
   left: clamp(1rem, 4vw, 4rem);
-  display: flex;
   justify-content: flex-end;
   gap: 0.25rem;
   pointer-events: auto;
