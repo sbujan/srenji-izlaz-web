@@ -42,8 +42,8 @@ const copy: Record<
     s1Tags: ["Niskogradnja", "Visokogradnja", "Ključ u ruke", "Roh-bau"],
     s2Title: "Posredovanje i prodaja nekretnina",
     s2Body:
-      "Posredujemo prilikom prodaje nekretnina i zemljišta te kupnje istih. Pregledajte sve nekretnine i projekte u aktualnoj ponudi.",
-    s2Cta: "Pogledaj oglase",
+      "Posredujemo prilikom prodaje nekretnina i zemljišta te kupnje istih. Javite nam se za aktualnu ponudu nekretnina i projekata.",
+    s2Cta: "Pošalji upit",
     aboutTitle: "O nama",
     aboutBody1:
       "Društvo Srednji izlaz d.o.o. osnovano je 2016. godine s ciljem iznajmljivanja vozila, no kroz godine je kontinuiranim rastom proširilo svoj spektar djelatnosti. Od najma osobnih i gospodarskih vozila, prodaje vozila i posredništva, društvo danas posreduje u prodaji nekretnina te se intenzivno razvilo u području izvođenja građevinskih radova.",
@@ -64,8 +64,8 @@ const copy: Record<
     s1Tags: ["Civil engineering", "Structural works", "Turnkey", "Roh-bau"],
     s2Title: "Real estate brokerage and sales",
     s2Body:
-      "We broker the sale and purchase of properties and land. Browse all properties and projects in the current offer.",
-    s2Cta: "View listings",
+      "We broker the sale and purchase of properties and land. Get in touch for the current offer of properties and projects.",
+    s2Cta: "Send an inquiry",
     aboutTitle: "About us",
     aboutBody1:
       "Srednji izlaz d.o.o. was founded in 2016 as a vehicle rental company, and through continuous growth it has steadily widened its scope. From renting and selling personal and commercial vehicles, the company today brokers real estate sales and has grown intensively in the field of construction.",
@@ -131,7 +131,7 @@ function Index() {
               <Reveal className="si-split-body" delay={90}>
                 <h3 className="si-h3">{t.s2Title}</h3>
                 <p>{t.s2Body}</p>
-                <a className="si-cta-listings" href="/oglasi">
+                <a className="si-cta-listings" href="/#kontakt">
                   <span className="si-cta-label">{t.s2Cta}</span>
                   <span aria-hidden="true" className="si-cta-ghost">
                     {t.s2Cta}

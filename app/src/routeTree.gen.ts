@@ -10,17 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as KarijeraRouteImport } from './routes/karijera'
 import { Route as OglasiRouteImport } from './routes/oglasi'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KarijeraRoute = KarijeraRouteImport.update({
-  id: '/karijera',
-  path: '/karijera',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OglasiRoute = OglasiRouteImport.update({
@@ -31,31 +25,27 @@ const OglasiRoute = OglasiRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/karijera': typeof KarijeraRoute
   '/oglasi': typeof OglasiRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/karijera': typeof KarijeraRoute
   '/oglasi': typeof OglasiRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/karijera': typeof KarijeraRoute
   '/oglasi': typeof OglasiRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/karijera' | '/oglasi'
+  fullPaths: '/' | '/oglasi'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/karijera' | '/oglasi'
-  id: '__root__' | '/' | '/karijera' | '/oglasi'
+  to: '/' | '/oglasi'
+  id: '__root__' | '/' | '/oglasi'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  KarijeraRoute: typeof KarijeraRoute
   OglasiRoute: typeof OglasiRoute
 }
 
@@ -66,13 +56,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/karijera': {
-      id: '/karijera'
-      path: '/karijera'
-      fullPath: '/karijera'
-      preLoaderRoute: typeof KarijeraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oglasi': {
@@ -87,7 +70,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  KarijeraRoute: KarijeraRoute,
   OglasiRoute: OglasiRoute,
 }
 export const routeTree = rootRouteImport

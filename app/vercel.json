@@ -90,5 +90,12 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/karijera",
+      "destination": "/oglasi",
+      "permanent": true
+    }
   ]
 }

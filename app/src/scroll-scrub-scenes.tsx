@@ -9,8 +9,6 @@
  * Both language arrays are module constants: the controller identity changes
  * only when the visitor toggles the language.
  */
-import { Link } from "@tanstack/react-router";
-
 import type {
   ScrollScrubScene,
   ScrollScrubTheme,
@@ -24,22 +22,24 @@ export const scrollScrubTheme: ScrollScrubTheme = {
   muted: "#9ba1aa",
 };
 
+// The company brokers property but publishes no listings page, so the chapter
+// invites an enquiry rather than promising an index that does not exist.
 const listingsCtaHr = (
-  <Link className="si-cta-listings" to="/oglasi">
-    <span className="si-cta-label">Pogledaj oglase</span>
+  <a className="si-cta-listings" href="#kontakt">
+    <span className="si-cta-label">Pošalji upit</span>
     <span aria-hidden="true" className="si-cta-ghost">
-      Pogledaj oglase
+      Pošalji upit
     </span>
-  </Link>
+  </a>
 );
 
 const listingsCtaEn = (
-  <Link className="si-cta-listings" to="/oglasi">
-    <span className="si-cta-label">View listings</span>
+  <a className="si-cta-listings" href="#kontakt">
+    <span className="si-cta-label">Send an inquiry</span>
     <span aria-hidden="true" className="si-cta-ghost">
-      View listings
+      Send an inquiry
     </span>
-  </Link>
+  </a>
 );
 
 export const scrollScrubScenesHr: ScrollScrubScene[] = [
@@ -74,7 +74,7 @@ export const scrollScrubScenesHr: ScrollScrubScene[] = [
   },
   {
     actions: listingsCtaHr,
-    body: "Posredujemo pri prodaji i kupnji nekretnina i zemljišta. Pregledajte aktualnu ponudu stanova i projekata.",
+    body: "Posredujemo pri prodaji i kupnji nekretnina i zemljišta. Javite se za aktualnu ponudu stanova i projekata.",
     clip: "/assets/world/scene-03.mp4",
     id: "nekretnine",
     kicker: "Nekretnine",
@@ -120,7 +120,7 @@ export const scrollScrubScenesEn: ScrollScrubScene[] = [
   },
   {
     actions: listingsCtaEn,
-    body: "We broker the sale and purchase of properties and land. Browse the current offer of apartments and projects.",
+    body: "We broker the sale and purchase of properties and land. Get in touch for the current offer of apartments and projects.",
     clip: "/assets/world/scene-03.mp4",
     id: "nekretnine",
     kicker: "Real estate",

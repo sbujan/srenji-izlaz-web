@@ -440,162 +440,122 @@
   margin-top: 0.4rem;
 }
 
-/* ---------- listings ---------- */
+/* ---------- vacancies ---------- */
 
-.si-listings {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: clamp(2rem, 4vw, 3rem);
-}
-.si-listing {
-  border: 1px solid var(--si-line);
-  background: var(--si-bg-2);
-  display: flex;
-  flex-direction: column;
-}
-.si-listing img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.05);
-}
-.si-listing-body {
-  padding: 1.3rem 1.3rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  flex: 1;
-}
-.si-listing-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.6rem;
-  font-family: var(--si-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--si-muted);
-}
-.si-listing-meta .si-status {
-  color: var(--si-accent-hi);
-}
-.si-listing h3 {
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0;
-}
-.si-listing p {
-  color: var(--si-muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  margin: 0;
-  flex: 1;
-}
-.si-listing-price {
-  font-family: var(--si-mono);
-  font-size: 0.8rem;
-  color: var(--si-ink);
+.si-vacancy {
   border-top: 1px solid var(--si-line);
-  padding-top: 0.9rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding-block: clamp(2rem, 4vw, 3.2rem);
 }
-@media (max-width: 960px) {
-  .si-listings {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (max-width: 640px) {
-  .si-listings {
-    grid-template-columns: 1fr;
-  }
-}
-.si-note {
-  font-family: var(--si-mono);
-  font-size: 0.78rem;
-  color: var(--si-muted);
-  border-left: 2px solid var(--si-accent);
-  padding-left: 0.9rem;
-  margin-top: 2.5rem;
-}
-.si-note a {
-  color: var(--si-accent-hi);
-  text-decoration: none;
-}
-.si-note a:hover {
-  text-decoration: underline;
-}
-
-/* ---------- jobs ---------- */
-
-.si-job {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 1rem 2rem;
-  align-items: center;
-  border-top: 1px solid var(--si-line);
-  padding-block: 1.8rem;
-}
-.si-job:last-of-type {
+.si-vacancy:last-of-type {
   border-bottom: 1px solid var(--si-line);
 }
-.si-job h3 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  margin: 0 0 0.35rem;
-}
-.si-job-meta {
-  font-family: var(--si-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--si-muted);
-  margin: 0 0 0.5rem;
-}
-.si-job p {
-  color: var(--si-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin: 0;
-  max-width: 60ch;
-}
-@media (max-width: 640px) {
-  .si-job {
-    grid-template-columns: 1fr;
-  }
-}
-.si-open-app {
-  margin-top: clamp(2.5rem, 5vw, 4rem);
-  border: 1px solid var(--si-line);
-  background: var(--si-bg-2);
-  padding: clamp(1.6rem, 4vw, 2.6rem);
+.si-vacancy-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
-  gap: 1.2rem;
+  gap: 1rem 2rem;
 }
-.si-open-app h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 0.3rem;
+.si-vacancy-tag {
+  font-family: var(--si-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--si-accent-hi);
+  margin: 0 0 0.5rem;
 }
-.si-open-app p {
-  color: var(--si-muted);
+.si-vacancy-head .si-h3 {
   margin: 0;
 }
-.si-hero-img {
-  display: block;
-  width: 100%;
-  max-height: 26rem;
-  object-fit: cover;
+.si-vacancy-summary {
+  color: var(--si-muted);
+  line-height: 1.7;
+  max-width: 68ch;
+  margin: 1.2rem 0 0;
+}
+
+/* Three labelled columns, set like the specification block on a drawing. */
+.si-vacancy-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.6rem 2.5rem;
+  margin-top: clamp(1.6rem, 3vw, 2.2rem);
+  padding-top: clamp(1.4rem, 3vw, 1.8rem);
+  border-top: 1px solid var(--si-line);
+}
+.si-vacancy-detail > div {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+}
+.si-vacancy-detail dt {
+  font-family: var(--si-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--si-muted);
+}
+.si-vacancy-detail dd {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.si-ticks {
+  display: grid;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.si-ticks li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.55;
+}
+.si-ticks li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--si-accent);
+}
+
+/* ---------- what we offer ---------- */
+
+/* Cards with their own borders rather than a 1px grid gap over a coloured
+   container: six items in a four-column auto-fit grid leave the last row short,
+   and the container showing through those empty cells read as stray grey
+   blocks. */
+.si-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+  list-style: none;
+  margin: clamp(2rem, 4vw, 3rem) 0 0;
+  padding: 0;
+}
+.si-benefits li {
+  background: var(--si-bg);
   border: 1px solid var(--si-line);
-  filter: grayscale(1) contrast(1.05);
+  border-left: 2px solid var(--si-accent);
+  padding: 1.3rem 1.4rem;
+  line-height: 1.6;
+}
+
+/* ---------- application ---------- */
+
+.si-apply {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(1.5rem, 5vw, 4rem);
+}
+@media (max-width: 860px) {
+  .si-apply {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---------- footer / contact ---------- */
@@ -738,7 +698,8 @@
   color: var(--si-muted);
 }
 .si-field input,
-.si-field textarea {
+.si-field textarea,
+.si-field select {
   width: 100%;
   border: 1px solid var(--si-line);
   background: var(--si-bg);
@@ -756,13 +717,15 @@
   min-height: 7rem;
 }
 .si-field input:focus-visible,
-.si-field textarea:focus-visible {
+.si-field textarea:focus-visible,
+.si-field select:focus-visible {
   outline: none;
   border-color: var(--si-accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--si-accent) 18%, transparent);
 }
 .si-field input[aria-invalid="true"],
-.si-field textarea[aria-invalid="true"] {
+.si-field textarea[aria-invalid="true"],
+.si-field select[aria-invalid="true"] {
   border-color: #b3261e;
 }
 .si-field-error {
@@ -859,4 +822,10 @@
   .si-footer {
     padding-bottom: 6rem;
   }
+}
+
+/* Footer without its form (a page that already has one) collapses to a single
+   column so the contact details are not stranded beside dead space. */
+.si-footer-cta--solo {
+  grid-template-columns: minmax(0, 1fr);
 }

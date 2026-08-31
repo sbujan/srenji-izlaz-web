@@ -34,7 +34,6 @@ export default defineConfig({
       pages: [
         { path: "/", sitemap: { priority: 1, changefreq: "monthly" } },
         { path: "/oglasi", sitemap: { priority: 0.8, changefreq: "weekly" } },
-        { path: "/karijera", sitemap: { priority: 0.6, changefreq: "monthly" } },
       ],
       prerender: {
         enabled: true,

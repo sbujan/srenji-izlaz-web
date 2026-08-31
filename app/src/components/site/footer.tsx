@@ -20,8 +20,7 @@ const copy: Record<
 > = {
   hr: {
     ctaTitle: "Imate projekt ili upit?",
-    ctaBody:
-      "Opišite nam ukratko što planirate — javljamo se s procjenom i sljedećim koracima.",
+    ctaBody: "Opišite nam ukratko što planirate — javljamo se s procjenom i sljedećim koracima.",
     person: "Ivan Pranjić",
     role: "Direktor",
     address: "Adresa",
@@ -42,14 +41,20 @@ const copy: Record<
   },
 };
 
-export function SiteFooter() {
+/**
+ * `showForm={false}` on a page that already has its own form — /oglasi carries a
+ * job application, and a second identical-looking form directly beneath it only
+ * makes a visitor wonder which one they are supposed to use. The contact details
+ * still show either way.
+ */
+export function SiteFooter({ showForm = true }: { showForm?: boolean } = {}) {
   const { lang } = useLang();
   const t = copy[lang];
 
   return (
     <footer className="si-footer" id="kontakt">
       <div className="si-container">
-        <div className="si-footer-cta">
+        <div className={showForm ? "si-footer-cta" : "si-footer-cta si-footer-cta--solo"}>
           <div className="si-contact-card">
             <h2 className="si-h2">{t.ctaTitle}</h2>
             <p className="si-lead">{t.ctaBody}</p>
@@ -89,7 +94,7 @@ export function SiteFooter() {
             </dl>
           </div>
 
-          <ContactForm />
+          {showForm ? <ContactForm /> : null}
         </div>
 
         <div className="si-footer-legal">

@@ -113,8 +113,8 @@ pairs, so a change means an edit and a push.
 
 | To change                     | Edit                                   |
 | ----------------------------- | -------------------------------------- |
-| Property listings             | `src/routes/oglasi.tsx` (`listings`)    |
-| Job ads                       | `src/routes/karijera.tsx` (`jobs`)      |
+| Job adverts                   | `src/routes/oglasi.tsx` (`jobs`)        |
+| What the employer offers      | `src/routes/oglasi.tsx` (`benefits`)    |
 | Services, about text, company facts | `src/routes/index.tsx` (`copy`)   |
 | Scroll journey chapters       | `src/scroll-scrub-scenes.tsx`           |
 | Nav, footer, contact details  | `src/components/site/`                  |
@@ -134,6 +134,9 @@ sitemap.
   `localStorage`; every page is prerendered in Croatian and there are no
   `/en/...` URLs, so search engines only ever see the Croatian text. Fixing it
   means adding real per-language routes.
-- **Listings are sample content.** The three entries in `oglasi.tsx` are
-  placeholders until real ones are supplied.
+- **The company brokers property but publishes no listings page.** The
+  real-estate call to action points at the contact block rather than an index
+  that does not exist. If listings are ever wanted, they need a new route.
+- **A role in the application select must exist in some advert's `roles`.** The
+  select is built from the adverts, so removing an advert removes its roles.
 - The contact route is a `mailto:` link, not a form.

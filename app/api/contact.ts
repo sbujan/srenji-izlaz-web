@@ -20,7 +20,7 @@
 
 export const config = { runtime: "edge" };
 
-const MAX = { name: 100, email: 200, message: 4000 };
+const MAX = { name: 100, email: 200, message: 4000, position: 100 };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const messages = {
@@ -120,6 +120,9 @@ export default async function handler(request: Request): Promise<Response> {
   const name = str(payload.name);
   const email = str(payload.email);
   const message = str(payload.message);
+  // Present only on a job application. Treated as free text and used solely as
+  // data in the plain-text body, so it needs a length cap, not a whitelist.
+  const position = str(payload.position).slice(0, MAX.position);
 
   // A filled honeypot means a script. Answer exactly like a success so the bot
   // has no signal to adapt to, and send nothing.
@@ -167,8 +170,11 @@ export default async function handler(request: Request): Promise<Response> {
         // Replying goes straight back to the person who wrote in. The address is
         // only ever used here as data, never interpolated into HTML.
         reply_to: email,
-        subject: `Upit s webstranice — ${singleLine(name)}`,
+        subject: position
+          ? `Prijava za posao: ${singleLine(position)} — ${singleLine(name)}`
+          : `Upit s webstranice — ${singleLine(name)}`,
         text: [
+          ...(position ? [`Radno mjesto: ${singleLine(position)}`] : []),
           `Ime: ${name}`,
           `E-mail: ${email}`,
           `Jezik: ${lang}`,
