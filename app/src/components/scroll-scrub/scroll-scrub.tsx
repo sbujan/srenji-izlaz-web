@@ -493,6 +493,15 @@ export function ScrollScrub({
         };
         video.addEventListener("seeked", markPainted, { once: true });
         video.addEventListener("playing", markPainted, { once: true });
+        if (playMode()) {
+          // The film driver only re-evaluates on dirty frames, and its buffer
+          // gate can be the thing holding playback back — so growth of the
+          // buffered ranges has to mark the frame dirty. Fires repeatedly as
+          // ranges extend; removed with the element in unloadClip.
+          video.addEventListener("progress", () => {
+            dirty = true;
+          });
+        }
 
         // In the DOM before `src`, so the media load algorithm runs on an
         // attached element — WebKit has historically been particular about
@@ -606,6 +615,26 @@ export function ScrollScrub({
      * already on screen, and retries a play() the platform refused once the
      * first gesture arrives.
      */
+    /**
+     * True when the buffered ranges cover the film from the playhead through
+     * `time`. Playback that starts without this freezes mid-motion the moment
+     * it outruns the download — measured on Fast 3G as visible stalls just
+     * before each chapter boundary. Waiting behind a still frame instead is
+     * invisible: the poster is the film's exact first frame, and later holds
+     * are the previous chapter's end frame.
+     */
+    const bufferedThrough = (video: HTMLVideoElement, time: number) => {
+      for (let i = 0; i < video.buffered.length; i++) {
+        if (
+          video.buffered.start(i) <= video.currentTime + 0.1 &&
+          video.buffered.end(i) >= time
+        ) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     const updateFilm = () => {
       const segment = runtime[0];
       const { video } = segment;
@@ -627,7 +656,14 @@ export function ScrollScrub({
         }
       }
       filmTarget = target;
-      if (video.paused && video.currentTime < filmTarget - 0.05) {
+      if (
+        video.paused &&
+        video.currentTime < filmTarget - 0.05 &&
+        bufferedThrough(
+          video,
+          Math.min(filmTarget, (video.duration || filmTarget) - 0.05)
+        )
+      ) {
         void video.play().catch(() => {
           // Autoplay refused (iOS Low Power Mode). onFirstGesture retries.
         });
