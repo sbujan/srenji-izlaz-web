@@ -242,6 +242,22 @@
 }
 
 @media (max-width: 860px) {
+  /* The "slight zoom while scrolling" on phones: the stage is sized in dvh,
+     the DYNAMIC viewport height, which grows as the browser's URL bar
+     collapses mid-scroll — and a cover-fit video in a growing box visibly
+     rescales. lvh is the LARGE viewport height, a constant, so the video's
+     framing never changes; while the URL bar is showing, the stage's bottom
+     sliver simply sits below the fold, which cover-cropped footage never
+     misses. The story's negative margin is this height's exact counterweight
+     (it re-aligns film and text) and MUST move in lockstep with it. Browsers
+     without lvh keep the dvh base rules. */
+  .scroll-scrub__stage {
+    height: 100lvh;
+  }
+  .scroll-scrub__story {
+    margin-top: -100lvh;
+  }
+
   /* One chapter, one screenful, one swipe.
      The height is an inline style from the scene's `scroll` weight (200dvh
      here), so overriding it needs !important — the same lever the

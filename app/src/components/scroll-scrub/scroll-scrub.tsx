@@ -486,15 +486,6 @@ export function ScrollScrub({
         };
         video.addEventListener("seeked", markPainted, { once: true });
         video.addEventListener("playing", markPainted, { once: true });
-        if (playMode()) {
-          // The film driver only re-evaluates on dirty frames, and its buffer
-          // gate can be the thing holding playback back — so growth of the
-          // buffered ranges has to mark the frame dirty. Fires repeatedly as
-          // ranges extend; removed with the element in unloadClip.
-          video.addEventListener("progress", () => {
-            dirty = true;
-          });
-        }
 
         // In the DOM before `src`, so the media load algorithm runs on an
         // attached element — WebKit has historically been particular about
@@ -597,34 +588,21 @@ export function ScrollScrub({
     };
 
     /**
-     * True when the buffered ranges cover the film from the playhead through
-     * `time`. Playback that starts without this freezes mid-motion the moment
-     * it outruns the download — measured on Fast 3G as visible stalls. Waiting
-     * behind a still frame instead is invisible: the poster is the film's
-     * exact first frame.
+     * Film driver, every frame. The film plays once, first frame to last, and
+     * `ended` with no loop holds the final frame; scrolling never touches it.
+     *
+     * There is deliberately NO buffering gate here any more. iOS Safari treats
+     * preload="auto" as metadata-only until playback begins, so any gate that
+     * waits for buffered data before calling play() deadlocks on a cold load —
+     * exactly the reported "starts only after a refresh", the refresh working
+     * because the file is then in HTTP cache. Muted playsinline play() is both
+     * permitted without a gesture and the very thing that makes iOS start
+     * fetching; on a slow connection the engine pauses and resumes decode by
+     * itself, holding the current frame, which beats never starting. Attempts
+     * are throttled: a rejected play() (iOS Low Power Mode) would otherwise
+     * retry sixty times a second.
      */
-    const bufferedThrough = (video: HTMLVideoElement, time: number) => {
-      for (let i = 0; i < video.buffered.length; i++) {
-        if (
-          video.buffered.start(i) <= video.currentTime + 0.1 &&
-          video.buffered.end(i) >= time
-        ) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    /**
-     * Film driver, dirty frames only. The film is scenery, not state: it plays
-     * exactly once, first frame to last, and stops there on its own (`ended`
-     * with no loop holds the final frame). Scrolling never pauses, seeks or
-     * restarts it — the text blocks move over it independently. Playback waits
-     * until the whole file is buffered so the single playthrough can never
-     * freeze mid-motion; until then the poster (the film's own first frame)
-     * covers. Idempotent per frame, which also retries a play() the platform
-     * refused once the first gesture arrives.
-     */
+    let lastPlayAttempt = 0;
     const updateFilm = () => {
       const segment = runtime[0];
       const { video } = segment;
@@ -632,27 +610,20 @@ export function ScrollScrub({
         return;
       }
       const duration = video.duration || 0;
-      // Start when the whole file is buffered, OR when the browser has both
-      // reached HAVE_ENOUGH_DATA and STOPPED downloading. The second clause
-      // breaks a real deadlock: with preload="auto" the browser may halt the
-      // fetch at "enough" (observed idle at ~5 of 6 s buffered) and only resume
-      // once playback approaches — which a full-buffer-only gate never lets
-      // happen. It is deliberately conditioned on the fetch being idle: while
-      // data is still arriving (a slow connection), readyState 4 alone is an
-      // optimistic estimate — trusting it mid-download produced a measured
-      // stall at 3.9 s on Fast 3G — so there we simply wait for the tail.
-      const NETWORK_LOADING = 2;
       if (
         video.paused &&
         !video.ended &&
         duration > 0 &&
-        video.currentTime < duration - 0.05 &&
-        (bufferedThrough(video, duration - 0.05) ||
-          (video.readyState >= 4 && video.networkState !== NETWORK_LOADING))
+        video.currentTime < duration - 0.05
       ) {
-        void video.play().catch(() => {
-          // Autoplay refused (iOS Low Power Mode). onFirstGesture retries.
-        });
+        const now = Date.now();
+        if (now - lastPlayAttempt > 400) {
+          lastPlayAttempt = now;
+          void video.play().catch(() => {
+            // Autoplay refused (iOS Low Power Mode). onFirstGesture holds the
+            // gesture-scoped retry that platforms accept.
+          });
+        }
       }
     };
 
@@ -759,8 +730,15 @@ export function ScrollScrub({
       }
       userReady = true;
       if (filmVisual()) {
-        // updateFilm runs every frame and retries the refused play() by
-        // itself; primeVideo's play-then-pause would stop a film in flight.
+        // iOS Low Power Mode only permits play() issued from inside a gesture
+        // handler — the animation-loop retries are rejected forever. This call
+        // is that gesture-scoped start.
+        const film = runtime[0].video;
+        if (film && film.paused && !film.ended) {
+          void film.play().catch(() => {
+            // Still refused; the loop keeps trying at its slow cadence.
+          });
+        }
         return;
       }
       for (const segment of runtime) {
